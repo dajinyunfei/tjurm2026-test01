@@ -5,9 +5,10 @@ int my_strlen(char *str) {
     /**
      * 统计字符串的长度。
      */
-
+   int  i=0;
+for(;str[i]!='\0';i++);
     // IMPLEMENT YOUR CODE HERE
-    return 0;
+    return i;
 }
 
 
@@ -17,7 +18,18 @@ void my_strcat(char *str_1, char *str_2) {
      * 将字符串str_2拼接到str_1之后，我们保证str_1指向的内存空间足够用于添加str_2。
      * 注意结束符'\0'的处理。
      */
-
+char * i = str_1;
+while(*i!='\0')
+{
+    i++;
+}
+while(*str_2!='\0')
+{
+    *i=*str_2;
+str_2++;
+i++;
+}
+*i='\0';
     // IMPLEMENT YOUR CODE HERE
 }
 
@@ -29,9 +41,24 @@ char* my_strstr(char *s, char *p) {
      * 例如：
      * s = "123456", p = "34"，应该返回指向字符'3'的指针。
      */
+    while(*s!='\0')
+    {char *i =s;
+char *j=p;
+while(*i!='\0'&&*j!='\0'&&*i==*j)
+{
+    i++;
+    j++;
+}
+if (*j=='\0')
+    return s;
+    s++;
+
+}
+return nullptr;
+
 
     // IMPLEMENT YOUR CODE HERE
-    return 0;
+  
 }
 
 
@@ -97,6 +124,20 @@ void rgb2gray(float *in, float *out, int h, int w) {
 
     // IMPLEMENT YOUR CODE HERE
     // ...
+  for(int i =0;i<h;i++)
+  {
+    for(int j =0;j<w;j++)
+    {
+int idx =(i*w+j)*3;
+float R=in[idx];
+float G=in[idx+1];
+float B=in[idx+2];
+float V = 0.1140 * B  + 0.5870 * G + 0.2989 * R;
+out[i*w+j]=V;
+    }
+  }
+
+    
 }
 
 // 练习5，实现图像处理算法 resize：缩小或放大图像
@@ -198,7 +239,30 @@ void resize(float *in, float *out, int h, int w, int c, float scale) {
 
     int new_h = h * scale, new_w = w * scale;
     // IMPLEMENT YOUR CODE HERE
+    for( int ch=0;ch<c;ch++){
+for(int x=0;x<new_w;x++)
+{for(int y =0;y<new_h;y++)
+    {
+        float x0=x/scale;
+        float y0=y/scale;
+        int x1 = static_cast<int>(x0);
+      int  y1 = static_cast<int>(y0);
+       int x2 = x1 + 1;
+    int y2 = y1 + 1;
+    x0 = x0 < 0 ? 0 : (x0 >= w ? w - 1 : x0);
+            y0 = y0 < 0 ? 0 : (y0 >= h ? h - 1 : y0);
+                  x2 = x2 >= w ? w - 1 : x2;
+            y2 = y2 >= h ? h - 1 : y2;
+       float q1 = in[(y1 * w + x1) * c + ch] * (x2 - x0) + in[(y1 * w + x2) * c + ch] * (x0 - x1);
+                float q2 = in[(y2 * w + x1) * c + ch] * (x2 - x0) + in[(y2 * w + x2) * c + ch] * (x0 - x1);
+                float result = q1 * (y2 - y0) + q2 * (y0 - y1);
 
+                out[(y * new_w + x) * c + ch] = result;
+
+    }
+
+}
+}
 }
 
 
@@ -221,4 +285,43 @@ void hist_eq(float *in, int h, int w) {
      */
 
     // IMPLEMENT YOUR CODE HERE
+    int N =h*w;
+    int arr[256]={0};
+    for(int i=0;i<h;i++)
+    {
+for(int j = 0;j<w;j++)
+{int idx = i*w+j;
+    int(grey_level)=(int)in[idx];
+    if(grey_level >= 0 && grey_level < 256) 
+                arr[grey_level]++;
+    
 }
+    }
+    float arr2[256]={0};
+    for(int i=0;i<266;i++)
+    {
+        arr2[i]=(float)arr[i]/N;
+    
+    }
+    float arr3[256]={0};
+    arr3[0]=arr2[0];
+    for(int i =1;i<256;i++)
+    {
+        arr3[i]=arr3[i-1]+arr2[i];
+    }
+    float arr4[256]={0};
+     for(int i=0;i<256;i++)
+    {
+        arr4[i]=arr3[i]*255+0.5f;
+    }
+     for (int i = 0; i < h; i++) {
+        for (int j = 0; j < w; j++) {
+            int idx = i * w + j;
+            int grey_level = (int)in[idx];
+             if(grey_level >= 0 && grey_level < 256)
+            in[idx] = arr4[grey_level];
+        }
+    }
+   
+}
+
